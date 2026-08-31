@@ -15,9 +15,9 @@ mp_hands = mp.solutions.hands # chọn giải pháp .hands
 mp_draw = mp.solutions.drawing_utils
 
 hands = mp_hands.Hands(
-    max_num_hands=1, # muốn một hay hai bàn tay
-    min_detection_confidence=0.5, # dộ phát hiện bàn tay trên 50% mới nhận là bàn tay
-    min_tracking_confidence=0.5 # múc tin tường bàn tay từ ban đầu theo dõi ko bị đổi khi có tay mới
+    max_num_hands=config.max_num_hands, # muốn một hay hai bàn tay
+    min_detection_confidence=config.min_detection_confidence, # dộ phát hiện bàn tay trên 50% mới nhận là bàn tay
+    min_tracking_confidence=config.min_tracking_confidence # múc tin tường bàn tay từ ban đầu theo dõi ko bị đổi khi có tay mới
 )
 
 # đọc video từ camera máy tính
@@ -60,7 +60,7 @@ while True:
             # Lấy phần cổ tay làm gốc
             wrist = hand_landmarks.landmark[0]
 
-            # chứa 21 tọa độ điểm
+            # chứa 63 tọa độ điểm
             landmarks = []
 
             # Lấy 21 landmarks

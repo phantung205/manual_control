@@ -24,7 +24,16 @@ learning_rate = 0.001
 
 # directory model
 dir_save_model = os.path.join(root_project,"trained_models")
+path_best_model = os.path.join(dir_save_model,"best_hands.pt")
 
 # directory tensorboard
 dir_tensorboard = os.path.join(root_project,"reports","tensorboard")
+
+# config parameter mediapip
+max_num_hands=1
+min_detection_confidence=0.5
+min_tracking_confidence=0.5
+
+# test
+confidence_threshold = 0.7
 
