@@ -1,0 +1,32 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+/* 1. Bắt buộc để Canvas đè lên đúng vị trí của Video */
+.video-container {
+    position: relative;
+    display: inline-block; /* Ôm sát kích thước video */
+    border: 2px solid #000;
+}
+#canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* 2. Bắt buộc để tạo hiệu ứng soi gương (trái/phải) */
+#camera, #canvas {
+    transform: scaleX(-1);
+}
+
+/* Trang trí nhẹ cho phần text dễ nhìn */
+.result-panel p {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 8px 0;
+}
+#label {
+    color: green;
+    font-size: 22px;
+}

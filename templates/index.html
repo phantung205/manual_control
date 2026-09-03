@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Gesture Recognition</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+</head>
+<body>
+
+    <h1>Hệ thống nhận diện cử chỉ bàn tay</h1>
+
+    <div class="container">
+        <!-- =====================================
+             KHU VỰC CAMERA & CANVAS HIỂN THỊ
+             ===================================== -->
+        <div class="video-container">
+            <!-- Camera -->
+            <video id="camera" width="640" height="480" autoplay playsinline></video>
+            <!-- Canvas để vẽ khung xương tay đè lên video -->
+            <canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+
+        <!-- =====================================
+             KHU VỰC KẾT QUẢ
+             ===================================== -->
+        <div class="result-panel">
+            <h2>Kết quả phân tích</h2>
+            <p>Trạng thái: <span id="status" class="value">Đang khởi động...</span></p>
+            <p>Frames: <span id="frames" class="value">0/30</span></p>
+            <hr>
+            <p>Nhãn (Label): <span id="label" class="value" style="color: #28a745; font-size: 24px;">---</span></p>
+            <p>Độ tin cậy: <span id="confidence" class="value">0%</span></p>
+        </div>
+    </div>
+
+    <!-- Canvas ẩn dùng để lấy hình ảnh gửi đi Flask -->
+    <canvas id="captureCanvas" width="320" height="240" style="display: none;"></canvas>
+
+    <script src="{{url_for('static',filename='js/script.js')}}"></script>
+</body>
+</html>
