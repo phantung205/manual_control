@@ -2,7 +2,7 @@ import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from configs import config
+from configs import config_hands
 
 
 class HandDataset(Dataset):
@@ -11,7 +11,7 @@ class HandDataset(Dataset):
         self.data_dir = data_dir
 
         # Danh sách class
-        self.classes = config.categories
+        self.classes = config_hands.categories
 
         # Chuyển class thành label
         #

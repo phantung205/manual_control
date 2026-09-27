@@ -1,5 +1,5 @@
 from deploy import inference
-from configs import config
+from configs import config_hands
 
 def predict_service(model,device,sequence):
 

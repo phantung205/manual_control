@@ -3,7 +3,7 @@ import mediapipe as mp
 import torch
 
 from model.lstm_model import HandLSTM
-from configs import config
+from configs import config_hands
 import numpy as np
 
 
@@ -11,8 +11,8 @@ import numpy as np
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # load model
-model = HandLSTM(num_classes=config.num_class).to(device)
-checkpoint = torch.load(config.path_best_model,map_location=device)
+model = HandLSTM(num_classes=config_hands.num_class).to(device)
+checkpoint = torch.load(config_hands.path_best_model,map_location=device)
 model.load_state_dict(checkpoint["model"])
 
 model.eval()
@@ -22,9 +22,9 @@ mp_hands = mp.solutions.hands
 mp_draw = mp.solutions.drawing_utils
 
 hands = mp_hands.Hands(
-    max_num_hands=config.max_num_hands, # muốn một hay hai bàn tay
-    min_detection_confidence=config.min_detection_confidence, # dộ phát hiện bàn tay trên 50% mới nhận là bàn tay
-    min_tracking_confidence=config.min_tracking_confidence # múc tin tường bàn tay từ ban đầu theo dõi ko bị đổi khi có tay mới
+    max_num_hands=config_hands.max_num_hands, # muốn một hay hai bàn tay
+    min_detection_confidence=config_hands.min_detection_confidence, # dộ phát hiện bàn tay trên 50% mới nhận là bàn tay
+    min_tracking_confidence=config_hands.min_tracking_confidence # múc tin tường bàn tay từ ban đầu theo dõi ko bị đổi khi có tay mới
 )
 
 # camera
@@ -32,10 +32,10 @@ cap = cv2.VideoCapture(0)
 
 #sequence
 sequence = [] # lưu 30 frame
-sequence_length = config.sequence_length # độ dài của frame
+sequence_length = config_hands.sequence_length # độ dài của frame
 
 #confidence theshold
-confidence_threshold = config.confidence_threshold
+confidence_threshold = config_hands.confidence_threshold
 
 current_label = "Unknown"
 current_confidence = 0.0
@@ -59,6 +59,19 @@ while True:
     if results.multi_hand_landmarks:
         # lấy ra bàn tay đầu tiên
         hand_landmarks = results.multi_hand_landmarks[0]
+
+        # lấy ra đang dùng tay trái hay phải
+        hand_label = results.multi_handedness[0].classification[0].label
+        # nghi ra tên tay nào
+        cv2.putText(
+            frame,
+            f"Hand: {hand_label}",
+            (10, 160),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 255, 0),
+            2
+        )
 
         # vẽ các đường nối lên camera
         mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
@@ -115,7 +128,7 @@ while True:
 
                 # kiểm tra xem có lớn hơn ngưỡng ko nếu ko lớn hơn thì để là chưa biết
                 if confidence >= confidence_threshold:
-                    current_label = (config.categories[predicted])
+                    current_label = (config_hands.categories[predicted])
                     current_confidence = confidence
 
                 else:

@@ -19,7 +19,7 @@ num_class = len(categories)
 
 #config train
 batch_size = 32
-num_epochs = 50
+num_epochs = 100
 learning_rate = 0.001
 
 # directory model
@@ -35,5 +35,5 @@ min_detection_confidence=0.5
 min_tracking_confidence=0.5
 
 # test
-confidence_threshold = 0.7
+confidence_threshold = 0.
 

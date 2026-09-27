@@ -1,4 +1,4 @@
-from configs import config
+from configs import config_hands
 import os
 import shutil
 
@@ -14,8 +14,8 @@ def split_class(class_name):
     files.sort()
 
     # tạo hai thư mục train và val
-    train_dir = os.path.join(config.dir_processed_data,"train",class_name)
-    val_dir = os.path.join(config.dir_processed_data,"val",class_name)
+    train_dir = os.path.join(config_hands.dir_processed_data,"train",class_name)
+    val_dir = os.path.join(config_hands.dir_processed_data,"val",class_name)
 
     os.makedirs(train_dir,exist_ok=True)
     os.makedirs(val_dir,exist_ok=True)
@@ -51,7 +51,7 @@ def split_class(class_name):
     )
 
 def main():
-    for class_name in config.categories:
+    for class_name in config_hands.categories:
         split_class(class_name)
 
 if __name__ == "__main__":

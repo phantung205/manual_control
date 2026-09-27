@@ -1,9 +1,8 @@
-import cv2
-from services import load_model_service,inference_service,landmark_service
+from services import load_model_service,inference_service,landmark_service,esp32_service,hand_label_service
 from flask import Blueprint,render_template, request,jsonify
 import mediapipe as mp
 import numpy as np
-from configs import config
+from configs import config_hands
 import cv2
 
 # load luôn model một lần
@@ -65,6 +64,7 @@ def predict():
             "ready": False,
             "frames": 0,
             "label": None,
+            "hand": None,
             "confidence": 0,
             "landmarks": []
         })
@@ -72,6 +72,9 @@ def predict():
 
     # Lấy bàn tay đầu tiên
     hand_landmarks = results.multi_hand_landmarks[0]
+
+    # xác định tay trái hay phải bằng pose
+    hand_label = hand_label_service.get_hand_label(results,0)
 
     # Lấy tọa độ để VẼ lên Web
     points = []
@@ -99,6 +102,7 @@ def predict():
             "ready": False,
             "frames": len(sequence),
             "label": None,
+            "hand": hand_label,
             "confidence": 0,
             "landmarks": points
         })
@@ -107,12 +111,29 @@ def predict():
     # Prediction
     result = inference_service.predict_service(model,device,np.array(sequence, dtype=np.float32))
 
+    label = result["label"]
+    confidence = result["confidence"]
+
+    # Camera web đang hiển thị dạng gương → đảo lại Left/Right
+    if hand_label == "Left":
+        hand_label = "Right"
+    elif hand_label == "Right":
+        hand_label = "Left"
+
+    # ĐIỀU KHIỂN ESP32
+    if hand_label == "Right" and label == "one_finger":
+        esp32_service.turn_on()
+    elif hand_label == "Left" and label == "one_finger":
+        esp32_service.turn_off()
+
+    # TRẢ KẾT QUẢ CHO JS
     return jsonify({
         "detected": True,
         "ready": True,
         "frames": len(sequence),
-        "label": result["label"],
-        "confidence": result["confidence"],
+        "label": label,
+        "hand": hand_label,
+        "confidence": confidence,
         "landmarks": points
     })
 

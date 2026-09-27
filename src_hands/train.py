@@ -1,11 +1,9 @@
 import argparse
 import torch
-from sympy.printing import c
-from torch.utils.checkpoint import checkpoint
 
-from src import dataloader,dataset
+from src_hands import dataloader,dataset
 from model.lstm_model import HandLSTM
-from configs import config
+from configs import config_hands
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 import shutil
@@ -13,13 +11,13 @@ import os
 
 def get_args():
     parser = argparse.ArgumentParser(description="train pose estimation")
-    parser.add_argument("--dir_train","-t",type=str,default=config.dir_train)
-    parser.add_argument("--dir_val","-v",type=str,default=config.dir_val)
-    parser.add_argument("--batch_size","-b",type=int,default=config.batch_size)
-    parser.add_argument("--epoch","-e",type=int,default=config.num_epochs)
-    parser.add_argument("--learning_rate","-l",type=float,default=config.learning_rate)
-    parser.add_argument("--save_model","-s",type=str,default=config.dir_save_model)
-    parser.add_argument("--path_tensorboard","-p",type=str,default=config.dir_tensorboard)
+    parser.add_argument("--dir_train","-t",type=str,default=config_hands.dir_train)
+    parser.add_argument("--dir_val","-v",type=str,default=config_hands.dir_val)
+    parser.add_argument("--batch_size","-b",type=int,default=config_hands.batch_size)
+    parser.add_argument("--epoch","-e",type=int,default=config_hands.num_epochs)
+    parser.add_argument("--learning_rate","-l",type=float,default=config_hands.learning_rate)
+    parser.add_argument("--save_model","-s",type=str,default=config_hands.dir_save_model)
+    parser.add_argument("--path_tensorboard","-p",type=str,default=config_hands.dir_tensorboard)
     parser.add_argument("--checkpoint","-c",type=str,default=None)
     return parser.parse_args()
 
@@ -47,7 +45,7 @@ def train(args):
     val_dataloader = dataloader.create_dataloader(dataset=val_dataset,batch_size=args.batch_size,shuffle=False)
 
     # model
-    model = HandLSTM(num_classes=config.num_class).to(device)
+    model = HandLSTM(num_classes=config_hands.num_class).to(device)
 
     # loss function
     criterion = torch.nn.CrossEntropyLoss()

@@ -2,11 +2,11 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import os
-from configs import config
+from configs import config_hands
 
 # nhập vào class bạn muốn tạo
 label = input("nhập vào class bạn muốn tạo: ").strip()
-path_data = os.path.join(config.dir_raw_data,label)
+path_data = os.path.join(config_hands.dir_raw_data,label)
 os.makedirs(path_data, exist_ok=True)
 
 # khởi tạo mediapipe
@@ -15,9 +15,9 @@ mp_hands = mp.solutions.hands # chọn giải pháp .hands
 mp_draw = mp.solutions.drawing_utils
 
 hands = mp_hands.Hands(
-    max_num_hands=config.max_num_hands, # muốn một hay hai bàn tay
-    min_detection_confidence=config.min_detection_confidence, # dộ phát hiện bàn tay trên 50% mới nhận là bàn tay
-    min_tracking_confidence=config.min_tracking_confidence # múc tin tường bàn tay từ ban đầu theo dõi ko bị đổi khi có tay mới
+    max_num_hands=config_hands.max_num_hands, # muốn một hay hai bàn tay
+    min_detection_confidence=config_hands.min_detection_confidence, # dộ phát hiện bàn tay trên 50% mới nhận là bàn tay
+    min_tracking_confidence=config_hands.min_tracking_confidence # múc tin tường bàn tay từ ban đầu theo dõi ko bị đổi khi có tay mới
 )
 
 # đọc video từ camera máy tính
@@ -27,9 +27,9 @@ sequence_count = 0 # dùng đếm xem đã thu đc bao nhiều sequence
 recording = False # sác định xem hiện tại có dang nghi hình hay ko
 
 # độ dài của frame lấy liên tục
-sequence_length = config.sequence_length
+sequence_length = config_hands.sequence_length
 # số lần lấy dữ liệu cho frame đó
-number_of_sequences = config.number_of_sequences
+number_of_sequences = config_hands.number_of_sequences
 
 while True:
     ret, frame = cap.read()
@@ -51,6 +51,19 @@ while True:
     if results.multi_hand_landmarks:
         # lấy ra bàn tay đầu tiên
         hand_landmarks = results.multi_hand_landmarks[0]
+
+        # lấy ra đang dùng tay trái hay phải
+        hand_label = results.multi_handedness[0].classification[0].label
+        # nghi ra tên tay nào
+        cv2.putText(
+            frame,
+            f"Hand: {hand_label}",
+            (10, 120),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 255, 0),
+            2
+        )
 
         # vẽ các điểm và các đường nối lên chính hình ảnh camera
         mp_draw.draw_landmarks(frame,hand_landmarks,mp_hands.HAND_CONNECTIONS)
@@ -115,6 +128,8 @@ while True:
             (0, 255, 0),
             2
         )
+
+
 
     # ĐỦ 30 FRAME
     if len(sequence) == sequence_length:
