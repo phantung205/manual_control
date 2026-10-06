@@ -4,7 +4,7 @@ import shutil
 
 def split_class(class_name):
     # lấy ra thư mục class
-    class_dir = os.path.join(config.dir_raw_data,class_name)
+    class_dir = os.path.join(config_hands.dir_data_hand_raw,class_name)
 
     # lấy tất cả các file trong thư mục class đó
     files = [file_name for file_name in os.listdir(class_dir) if file_name.endswith(".npy")]
@@ -14,8 +14,8 @@ def split_class(class_name):
     files.sort()
 
     # tạo hai thư mục train và val
-    train_dir = os.path.join(config_hands.dir_processed_data,"train",class_name)
-    val_dir = os.path.join(config_hands.dir_processed_data,"val",class_name)
+    train_dir = os.path.join(config_hands.dir_data_hand_processed,"train",class_name)
+    val_dir = os.path.join(config_hands.dir_data_hand_processed,"val",class_name)
 
     os.makedirs(train_dir,exist_ok=True)
     os.makedirs(val_dir,exist_ok=True)

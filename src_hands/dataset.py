@@ -13,16 +13,8 @@ class HandDataset(Dataset):
         # Danh sách class
         self.classes = config_hands.categories
 
-        # Chuyển class thành label
-        #
-        # Ví dụ:
-        # fist       -> 0
-        # open_hand  -> 1
-        # peace      -> 2
-        self.class_to_idx = {
-            class_name: idx
-            for idx, class_name in enumerate(self.classes)
-        }
+        # Chuyển class thành label  số
+        self.class_to_idx = {class_name: idx for idx, class_name in enumerate(self.classes)}
 
 
         # Danh sách:

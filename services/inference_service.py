@@ -17,7 +17,7 @@ def predict_service(model,device,sequence):
         sequence=sequence,
         model=model,
         device=device,
-        classes=config.categories
+        classes=config_hands.categories
     )
 
 

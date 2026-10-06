@@ -11,13 +11,13 @@ import os
 
 def get_args():
     parser = argparse.ArgumentParser(description="train pose estimation")
-    parser.add_argument("--dir_train","-t",type=str,default=config_hands.dir_train)
-    parser.add_argument("--dir_val","-v",type=str,default=config_hands.dir_val)
+    parser.add_argument("--dir_train","-t",type=str,default=config_hands.dir_train_hand)
+    parser.add_argument("--dir_val","-v",type=str,default=config_hands.dir_val_hand)
     parser.add_argument("--batch_size","-b",type=int,default=config_hands.batch_size)
     parser.add_argument("--epoch","-e",type=int,default=config_hands.num_epochs)
     parser.add_argument("--learning_rate","-l",type=float,default=config_hands.learning_rate)
-    parser.add_argument("--save_model","-s",type=str,default=config_hands.dir_save_model)
-    parser.add_argument("--path_tensorboard","-p",type=str,default=config_hands.dir_tensorboard)
+    parser.add_argument("--save_model","-s",type=str,default=config_hands.dir_save_model_hand)
+    parser.add_argument("--path_tensorboard","-p",type=str,default=config_hands.dir_tensorboard_hand)
     parser.add_argument("--checkpoint","-c",type=str,default=None)
     return parser.parse_args()
 

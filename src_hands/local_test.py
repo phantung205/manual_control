@@ -12,7 +12,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # load model
 model = HandLSTM(num_classes=config_hands.num_class).to(device)
-checkpoint = torch.load(config_hands.path_best_model,map_location=device)
+checkpoint = torch.load(config_hands.path_best_model_hand,map_location=device)
 model.load_state_dict(checkpoint["model"])
 
 model.eval()

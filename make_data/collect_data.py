@@ -6,11 +6,11 @@ from configs import config_hands
 
 # nhập vào class bạn muốn tạo
 label = input("nhập vào class bạn muốn tạo: ").strip()
-path_data = os.path.join(config_hands.dir_raw_data,label)
+path_data = os.path.join(config_hands.dir_data_hand_raw,label)
 os.makedirs(path_data, exist_ok=True)
 
 # khởi tạo mediapipe
-mp_hands = mp.solutions.hands # chọn giải pháp .hands
+mp_hands = mp.solutions.hands # chọn giải pháp .hand
 # lấy công cụ vẽ landmark
 mp_draw = mp.solutions.drawing_utils
 

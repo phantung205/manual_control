@@ -1,43 +1,586 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hand Gesture Recognition</title>
-    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+
+    <title>Nhà thông minh</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-    <h1>Hệ thống nhận diện cử chỉ bàn tay</h1>
-
     <div class="container">
-        <!-- =====================================
-             KHU VỰC CAMERA & CANVAS HIỂN THỊ
-             ===================================== -->
-        <div class="video-container">
-            <!-- Camera -->
-            <video id="camera" width="640" height="480" autoplay playsinline></video>
-            <!-- Canvas để vẽ khung xương tay đè lên video -->
-            <canvas id="canvas" width="640" height="480"></canvas>
+
+        <!-- ========================= -->
+        <!-- HEADER -->
+        <!-- ========================= -->
+
+        <header>
+            <h1>🏠 NHÀ THÔNG MINH</h1>
+            <p>Hệ thống giám sát và điều khiển thiết bị</p>
+        </header>
+
+<!-- ========================= -->
+        <!-- MEDIAPIPE -->
+        <!-- ========================= -->
+
+        <section class="gesture-section">
+
+            <div class="gesture-header">
+
+                <div>
+
+                    <h2>
+                        🖐️ Điều khiển bằng cử chỉ
+                    </h2>
+
+                    <p>
+                        Nhận diện bàn tay bằng MediaPipe
+                    </p>
+
+                </div>
+
+                <span class="ai-status">
+                    ● AI READY
+                </span>
+
+            </div>
+
+
+            <div class="gesture-content">
+
+
+                <!-- CAMERA -->
+
+                <div class="camera-box">
+
+                    <div class="camera-title">
+
+                        <span>
+                            📷 CAMERA
+                        </span>
+
+                        <span class="camera-live">
+                            ● LIVE
+                        </span>
+
+                    </div>
+
+                    <div class="camera-screen">
+                        <div class="video-container">
+                            <video id="camera" width="640" height="480" autoplay playsinline></video>
+                            <canvas id="canvas" width="640" height="480"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- THÔNG TIN CỬ CHỈ -->
+
+                <div class="gesture-info">
+                    <div class="info-card">
+                        <span class="info-label">TAY NHẬN DIỆN</span>
+                        <strong id="hand">--</strong>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">SỐ FRAME (CHỜ 30)</span>
+                        <strong id="frames">0/30</strong>
+                    </div>
+
+
+
+                    <div class="info-card">
+
+                        <span class="info-label">
+                            CỬ CHỈ NHẬN DIỆN
+                        </span>
+
+                        <strong id="gesture">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-card">
+
+                        <span class="info-label">
+                            LỆNH ĐIỀU KHIỂN
+                        </span>
+
+                        <strong id="gestureCommand">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-card">
+
+                        <span class="info-label">
+                            TRẠNG THÁI ESP32
+                        </span>
+
+                        <strong class="esp-online">
+                            ● ONLINE
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    
+
+
+        <!-- ========================= -->
+        <!-- CẢM BIẾN -->
+        <!-- ========================= -->
+
+        <section class="sensor-section">
+
+            <h2>📊 Thông tin cảm biến</h2>
+
+            <div class="sensor-grid">
+
+                <div class="sensor-card">
+                    <h3>🌡️ Nhiệt độ</h3>
+                    <p id="temperature">-- °C</p>
+                </div>
+
+                <div class="sensor-card">
+                    <h3>💧 Độ ẩm</h3>
+                    <p id="humidity">-- %</p>
+                </div>
+
+                <div class="sensor-card">
+                    <h3>🔥 Khí gas</h3>
+                    <p id="gas">--</p>
+                </div>
+
+                <div class="sensor-card">
+                    <h3>🌱 Độ ẩm đất</h3>
+                    <p id="soil">--</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- ĐIỀU KHIỂN THIẾT BỊ -->
+        <!-- ========================= -->
+
+        <section>
+
+            <h2>🎛️ Điều khiển thiết bị</h2>
+
+            <div class="device-grid">
+
+
+                <!-- ========================= -->
+                <!-- QUẠT -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        🌀 Quạt
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="fan">--</span>
+                    </div>
+
+                    <div class="mode-control">
+
+                        <span class="mode-label">
+                            Chế độ
+                        </span>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                id="fanModeSwitch"
+                                onchange="changeFanMode(this)"
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                        <span
+                            id="fanModeText"
+                            class="mode-text">
+                            TỰ ĐỘNG
+                        </span>
+
+                    </div>
+
+                    <!-- Chỉ hiển thị khi THỦ CÔNG -->
+
+                    <div
+                        id="fanManualButtons"
+                        class="manual-buttons">
+
+                        <button
+                            class="on"
+                            onclick="sendCommand('/quat/on')">
+                            BẬT
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/quat/off')">
+                            TẮT
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- MÁY BƠM -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        💧 Máy bơm
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="pump">--</span>
+                    </div>
+
+                    <div class="mode-control">
+
+                        <span class="mode-label">
+                            Chế độ
+                        </span>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                id="pumpModeSwitch"
+                                onchange="changePumpMode(this)"
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                        <span
+                            id="pumpModeText"
+                            class="mode-text">
+                            TỰ ĐỘNG
+                        </span>
+
+                    </div>
+
+                    <!-- Chỉ hiển thị khi THỦ CÔNG -->
+
+                    <div
+                        id="pumpManualButtons"
+                        class="manual-buttons">
+
+                        <button
+                            class="on"
+                            onclick="sendCommand('/bom/on')">
+                            BẬT
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/bom/off')">
+                            TẮT
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- ĐÈN CẦU THANG -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        💡 Đèn cầu thang
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="stair">--</span>
+                    </div>
+
+                    <div class="mode-control">
+
+                        <span class="mode-label">
+                            Chế độ
+                        </span>
+
+                        <label class="switch">
+
+                            <input
+                                type="checkbox"
+                                id="stairModeSwitch"
+                                onchange="changeStairMode(this)"
+                            >
+
+                            <span class="slider"></span>
+
+                        </label>
+
+                        <span
+                            id="stairModeText"
+                            class="mode-text">
+                            TỰ ĐỘNG
+                        </span>
+
+                    </div>
+
+                    <!-- Chỉ hiển thị khi THỦ CÔNG -->
+
+                    <div
+                        id="stairManualButtons"
+                        class="manual-buttons">
+
+                        <button
+                            class="on"
+                            onclick="sendCommand('/cauthang/on')">
+                            BẬT
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/cauthang/off')">
+                            TẮT
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- ĐÈN XANH -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        🟢 Đèn xanh
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="greenLed">--</span>
+                    </div>
+
+                    <div class="buttons">
+
+                        <button
+                            class="on"
+                            onclick="sendCommand('/led_xanh/on')">
+                            BẬT
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/led_xanh/off')">
+                            TẮT
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- ĐÈN ĐỎ -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        🔴 Đèn đỏ
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="redLed">--</span>
+                    </div>
+
+                    <div class="buttons">
+
+                        <button
+                            class="on"
+                            onclick="sendCommand('/led_do/on')">
+                            BẬT
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/led_do/off')">
+                            TẮT
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- CÒI BÁO ĐỘNG -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        🔊 Còi báo động
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="buzzer">--</span>
+                    </div>
+
+                    <div class="buttons">
+
+                        <button
+                            class="on"
+                            onclick="sendCommand('/coi/on')">
+                            BẬT
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/coi/off')">
+                            TẮT
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- OLED -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        📺 Màn hình OLED
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="oled">--</span>
+                    </div>
+
+                    <div class="buttons">
+
+                        <button
+                            class="on"
+                            onclick="sendCommand('/oled/on')">
+                            BẬT
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/oled/off')">
+                            TẮT
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- CỬA -->
+                <!-- ========================= -->
+
+                <div class="device">
+
+                    <div class="device-name">
+                        🚪 Cửa
+                    </div>
+
+                    <div class="device-status">
+                        Trạng thái:
+                        <span id="door">--</span>
+                    </div>
+
+                    <div class="buttons">
+
+                        <button
+                            class="open"
+                            onclick="sendCommand('/cua/open')">
+                            MỞ CỬA
+                        </button>
+
+                        <button
+                            class="off"
+                            onclick="sendCommand('/cua/close')">
+                            ĐÓNG CỬA
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- KẾT NỐI ESP32 -->
+        <!-- ========================= -->
+
+        <section class="connection">
+
+            <h2>📡 Kết nối hệ thống</h2>
+
+            <p id="connection">
+                ⏳ Đang kiểm tra kết nối ESP32...
+            </p>
+
+            <p id="message">
+                Chưa có lệnh nào được gửi.
+            </p>
+
+        </section>
+
+
         </div>
 
-        <!-- =====================================
-             KHU VỰC KẾT QUẢ
-             ===================================== -->
-        <div class="result-panel">
-            <h2>Kết quả phân tích</h2>
-            <p>Trạng thái: <span id="status" class="value">Đang khởi động...</span></p>
-            <p>Frames: <span id="frames" class="value">0/30</span></p>
-            <p>Bàn tay: <span id="hand" class="value">---</span></p>
-            <hr>
-            <p>Nhãn (Label): <span id="label" class="value" style="color: #28a745; font-size: 24px;">---</span></p>
-            <p>Độ tin cậy: <span id="confidence" class="value">0%</span></p>
-        </div>
-    </div>
 
-    <!-- Canvas ẩn dùng để lấy hình ảnh gửi đi Flask -->
-    <canvas id="captureCanvas" width="320" height="240" style="display: none;"></canvas>
+    <!-- JAVASCRIPT -->
 
-    <script src="{{url_for('static',filename='js/script.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 </body>
+
 </html>
