@@ -83,12 +83,12 @@ def close_cua():
 def turn_on_pump():
     if should_send('pump_on'):
         print("ESP32: Gửi lệnh BẬT MÁY BƠM")
-        send_request_async([f"http://{esp32_ip}/bom/manual", f"http://{esp32_ip}/bom/on"])
+        send_request_async([f"http://{esp32_ip}/bom/on"])
 
 def turn_off_pump():
     if should_send('pump_off'):
         print("ESP32: Gửi lệnh TẮT MÁY BƠM")
-        send_request_async([f"http://{esp32_ip}/bom/manual", f"http://{esp32_ip}/bom/off"])
+        send_request_async([f"http://{esp32_ip}/bom/off"])
 
 # ==================================
 # ĐIỀU KHIỂN CÒI (BUZZER)
@@ -108,6 +108,13 @@ def turn_off_coi():
 # ==================================
 def send_command(endpoint):
     try:
+        # Tự động vô hiệu hóa AUTO của Quạt khi có bất kỳ lệnh bật/tắt quạt nào
+        if endpoint in ["quat/on", "quat/off"]:
+            try:
+                requests.get(f"http://{esp32_ip}/quat/manual", timeout=2)
+            except:
+                pass
+                
         response = requests.get(f"http://{esp32_ip}/{endpoint}", timeout=2)
         return response.ok, response.text
     except requests.RequestException as e:

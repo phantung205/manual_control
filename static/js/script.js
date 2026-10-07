@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  Lấy các phần tử HTML
 // ============================================================
 const video       = document.getElementById('camera');
@@ -44,20 +44,6 @@ function sendCommand(endpoint) {
     .catch(err => {
         if(messageEl) messageEl.innerText = 'Lỗi mạng!';
     });
-}
-
-function changeFanMode(switchEl) {
-    const modeText = document.getElementById('fanModeText');
-    const manualBtns = document.getElementById('fanManualButtons');
-    if(switchEl.checked) {
-        modeText.innerText = 'THỦ CÔNG';
-        manualBtns.style.display = 'flex';
-        sendCommand('/quat/manual');
-    } else {
-        modeText.innerText = 'TỰ ĐỘNG';
-        manualBtns.style.display = 'none';
-        sendCommand('/quat/auto');
-    }
 }
 
 function changePumpMode(switchEl) {
@@ -223,7 +209,6 @@ async function sendFrameLoop() {
 
 startCamera();
 
-
 // ============================================================
 //  Lấy trạng thái từ ESP32 (Sensors & Devices)
 // ============================================================
@@ -241,7 +226,7 @@ function updateStatus() {
                 if (document.getElementById('gas')) document.getElementById('gas').innerText = status.gas;
                 if (document.getElementById('soil')) document.getElementById('soil').innerText = status.soil;
                 
-                // Trạng thái thiết bị
+                // Trạng thái bật/tắt thiết bị
                 if (document.getElementById('fan')) document.getElementById('fan').innerText = status.fan;
                 if (document.getElementById('pump')) document.getElementById('pump').innerText = status.pump;
                 if (document.getElementById('stair')) document.getElementById('stair').innerText = status.stair;
@@ -250,6 +235,34 @@ function updateStatus() {
                 if (document.getElementById('buzzer')) document.getElementById('buzzer').innerText = status.buzzer;
                 if (document.getElementById('door')) document.getElementById('door').innerText = status.door;
                 if (document.getElementById('oled')) document.getElementById('oled').innerText = status.oled;
+                
+                // Đồng bộ Switch Mode (Bơm)
+                const pumpSwitch = document.getElementById('pumpModeSwitch');
+                if (pumpSwitch) {
+                    if (status.pumpMode === 'MANUAL' && !pumpSwitch.checked) {
+                        pumpSwitch.checked = true;
+                        document.getElementById('pumpModeText').innerText = 'THỦ CÔNG';
+                        document.getElementById('pumpManualButtons').style.display = 'flex';
+                    } else if (status.pumpMode === 'AUTO' && pumpSwitch.checked) {
+                        pumpSwitch.checked = false;
+                        document.getElementById('pumpModeText').innerText = 'TỰ ĐỘNG';
+                        document.getElementById('pumpManualButtons').style.display = 'none';
+                    }
+                }
+                
+                // Đồng bộ Switch Mode (Cầu thang)
+                const stairSwitch = document.getElementById('stairModeSwitch');
+                if (stairSwitch) {
+                    if (status.stairMode === 'MANUAL' && !stairSwitch.checked) {
+                        stairSwitch.checked = true;
+                        document.getElementById('stairModeText').innerText = 'THỦ CÔNG';
+                        document.getElementById('stairManualButtons').style.display = 'flex';
+                    } else if (status.stairMode === 'AUTO' && stairSwitch.checked) {
+                        stairSwitch.checked = false;
+                        document.getElementById('stairModeText').innerText = 'TỰ ĐỘNG';
+                        document.getElementById('stairManualButtons').style.display = 'none';
+                    }
+                }
                 
                 // Connection status
                 if (document.getElementById('connection')) document.getElementById('connection').innerText = '✅ ESP32 Đang kết nối';
