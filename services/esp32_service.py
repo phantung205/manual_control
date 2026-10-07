@@ -1,176 +1,107 @@
-import requests
+﻿import requests
+import threading
+import time
 
-esp32_ip = "192.168.37.106"
+esp32_ip = "172.20.10.2"
 
-# Quản lý trạng thái riêng biệt cho từng đèn
-led_xanh_state = None
-led_do_state = None
+# Quản lý thời gian gửi lệnh cuối cùng để tránh spam (cooldown 3s)
+last_command_time = {}
+
+def send_request_async(urls):
+    def task():
+        for url in urls:
+            try:
+                requests.get(url, timeout=3)
+            except Exception as e:
+                print(f"Lỗi kết nối {url}:", e)
+    threading.Thread(target=task).start()
+
+def should_send(command_key):
+    global last_command_time
+    now = time.time()
+    if command_key in last_command_time:
+        if now - last_command_time[command_key] < 3.0:
+            return False # Đang trong thời gian cooldown
+    last_command_time[command_key] = now
+    return True
 
 # ==================================
 # ĐIỀU KHIỂN LED XANH
 # ==================================
 def turn_on_led_xanh():
-    global led_xanh_state
-    if led_xanh_state == "on":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/led_xanh/on", timeout=2)
-        if response.ok:
-            led_xanh_state = "on"
-            print("ESP32: Đèn XANH đã BẬT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối LED Xanh:", e)
+    if should_send('led_xanh_on'):
+        print("ESP32: Gửi lệnh BẬT ĐÈN XANH")
+        send_request_async([f"http://{esp32_ip}/led_xanh/on"])
 
 def turn_off_led_xanh():
-    global led_xanh_state
-    if led_xanh_state == "off":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/led_xanh/off", timeout=2)
-        if response.ok:
-            led_xanh_state = "off"
-            print("ESP32: Đèn XANH đã TẮT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối LED Xanh:", e)
+    if should_send('led_xanh_off'):
+        print("ESP32: Gửi lệnh TẮT ĐÈN XANH")
+        send_request_async([f"http://{esp32_ip}/led_xanh/off"])
 
 # ==================================
 # ĐIỀU KHIỂN LED ĐỎ
 # ==================================
 def turn_on_led_do():
-    global led_do_state
-    if led_do_state == "on":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/led_do/on", timeout=2)
-        if response.ok:
-            led_do_state = "on"
-            print("ESP32: Đèn ĐỎ đã BẬT (Cảnh báo!)")
-    except requests.RequestException as e:
-        print("Lỗi kết nối LED Đỏ:", e)
+    if should_send('led_do_on'):
+        print("ESP32: Gửi lệnh BẬT ĐÈN ĐỎ")
+        send_request_async([f"http://{esp32_ip}/led_do/on"])
 
 def turn_off_led_do():
-    global led_do_state
-    if led_do_state == "off":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/led_do/off", timeout=2)
-        if response.ok:
-            led_do_state = "off"
-            print("ESP32: Đèn ĐỎ đã TẮT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối LED Đỏ:", e)
+    if should_send('led_do_off'):
+        print("ESP32: Gửi lệnh TẮT ĐÈN ĐỎ")
+        send_request_async([f"http://{esp32_ip}/led_do/off"])
 
 # ==================================
-# ĐIỀU KHIỂN QUẠT
+# ĐIỀU KHIỂN QUẠT (Ép sang MANUAL rồi mới BẬT/TẮT)
 # ==================================
-quat_state = None
 def turn_on_quat():
-    global quat_state
-    if quat_state == "on":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/quat/on", timeout=2)
-        if response.ok:
-            quat_state = "on"
-            print("ESP32: QUẠT đã BẬT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Quạt:", e)
+    if should_send('quat_on'):
+        print("ESP32: Gửi lệnh BẬT QUẠT")
+        send_request_async([f"http://{esp32_ip}/quat/manual", f"http://{esp32_ip}/quat/on"])
 
 def turn_off_quat():
-    global quat_state
-    if quat_state == "off":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/quat/off", timeout=2)
-        if response.ok:
-            quat_state = "off"
-            print("ESP32: QUẠT đã TẮT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Quạt:", e)
+    if should_send('quat_off'):
+        print("ESP32: Gửi lệnh TẮT QUẠT")
+        send_request_async([f"http://{esp32_ip}/quat/manual", f"http://{esp32_ip}/quat/off"])
 
 # ==================================
 # ĐIỀU KHIỂN CỬA (SERVO)
 # ==================================
-cua_state = None
 def open_cua():
-    global cua_state
-    if cua_state == "open":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/cua/open", timeout=2)
-        if response.ok:
-            cua_state = "open"
-            print("ESP32: CỬA đã MỞ")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Cửa:", e)
+    if should_send('cua_open'):
+        print("ESP32: Gửi lệnh MỞ CỬA")
+        send_request_async([f"http://{esp32_ip}/cua/open"])
 
 def close_cua():
-    global cua_state
-    if cua_state == "close":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/cua/close", timeout=2)
-        if response.ok:
-            cua_state = "close"
-            print("ESP32: CỬA đã ĐÓNG")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Cửa:", e)
+    if should_send('cua_close'):
+        print("ESP32: Gửi lệnh ĐÓNG CỬA")
+        send_request_async([f"http://{esp32_ip}/cua/close"])
 
 # ==================================
-# ĐIỀU KHIỂN MÁY BƠM
+# ĐIỀU KHIỂN MÁY BƠM (Ép sang MANUAL rồi mới BẬT/TẮT)
 # ==================================
-bom_state = None
 def turn_on_pump():
-    global bom_state
-    if bom_state == "on":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/bom/on", timeout=2)
-        if response.ok:
-            bom_state = "on"
-            print("ESP32: MÁY BƠM đã BẬT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Máy bơm:", e)
+    if should_send('pump_on'):
+        print("ESP32: Gửi lệnh BẬT MÁY BƠM")
+        send_request_async([f"http://{esp32_ip}/bom/manual", f"http://{esp32_ip}/bom/on"])
 
 def turn_off_pump():
-    global bom_state
-    if bom_state == "off":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/bom/off", timeout=2)
-        if response.ok:
-            bom_state = "off"
-            print("ESP32: MÁY BƠM đã TẮT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Máy bơm:", e)
+    if should_send('pump_off'):
+        print("ESP32: Gửi lệnh TẮT MÁY BƠM")
+        send_request_async([f"http://{esp32_ip}/bom/manual", f"http://{esp32_ip}/bom/off"])
 
 # ==================================
 # ĐIỀU KHIỂN CÒI (BUZZER)
 # ==================================
-coi_state = None
 def turn_on_coi():
-    global coi_state
-    if coi_state == "on":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/coi/on", timeout=2)
-        if response.ok:
-            coi_state = "on"
-            print("ESP32: CÒI đã BẬT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Còi:", e)
+    if should_send('coi_on'):
+        print("ESP32: Gửi lệnh BẬT CÒI")
+        send_request_async([f"http://{esp32_ip}/coi/on"])
 
 def turn_off_coi():
-    global coi_state
-    if coi_state == "off":
-        return
-    try:
-        response = requests.get(f"http://{esp32_ip}/coi/off", timeout=2)
-        if response.ok:
-            coi_state = "off"
-            print("ESP32: CÒI đã TẮT")
-    except requests.RequestException as e:
-        print("Lỗi kết nối Còi:", e)
+    if should_send('coi_off'):
+        print("ESP32: Gửi lệnh TẮT CÒI")
+        send_request_async([f"http://{esp32_ip}/coi/off"])
 
 # ==================================
 # PROXY COMMAND CHO UI
