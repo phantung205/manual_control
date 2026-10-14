@@ -1,6 +1,4 @@
-﻿// ============================================================
-//  Lấy các phần tử HTML
-// ============================================================
+﻿
 const video       = document.getElementById('camera');
 const drawCanvas  = document.getElementById('canvas');
 const drawCtx     = drawCanvas.getContext('2d');
@@ -11,9 +9,7 @@ const messageEl   = document.getElementById('message');
 const handEl      = document.getElementById('hand');
 const framesEl    = document.getElementById('frames');
 
-// ============================================================
-//  Kết nối 21 điểm khung xương bàn tay (MediaPipe)
-// ============================================================
+
 const HAND_CONNECTIONS = [
     [0,1],[1,2],[2,3],[3,4],       // ngón cái
     [0,5],[5,6],[6,7],[7,8],       // ngón trỏ
@@ -23,9 +19,7 @@ const HAND_CONNECTIONS = [
     [0,17]                         // lòng bàn tay
 ];
 
-// ============================================================
-//  Manual Commands
-// ============================================================
+
 function sendCommand(endpoint) {
     if (endpoint.startsWith('/')) {
         endpoint = endpoint.substring(1);
@@ -74,9 +68,7 @@ function changeStairMode(switchEl) {
     }
 }
 
-// ============================================================
-//  Bật camera
-// ============================================================
+
 async function startCamera() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
@@ -87,9 +79,7 @@ async function startCamera() {
     }
 }
 
-// ============================================================
-//  Vẽ khung xương tay lên canvas
-// ============================================================
+
 function drawLandmarks(landmarks) {
     drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
     if (!landmarks || landmarks.length === 0) return;
@@ -119,9 +109,7 @@ function drawLandmarks(landmarks) {
     }
 }
 
-// ============================================================
-//  Cập nhật UI kết quả AI
-// ============================================================
+
 function updateUI(data) {
     if(framesEl) framesEl.innerText = data.frames + '/30';
 
@@ -164,9 +152,7 @@ function updateUI(data) {
     if(gestureCmd) gestureCmd.innerText = commandText;
 }
 
-// ============================================================
-//  Chụp frame → flip ngang → gửi lên server
-// ============================================================
+
 function captureFlippedFrame() {
     const tmp = document.createElement('canvas');
     tmp.width  = 320;
@@ -209,9 +195,7 @@ async function sendFrameLoop() {
 
 startCamera();
 
-// ============================================================
-//  Lấy trạng thái từ ESP32 (Sensors & Devices)
-// ============================================================
+
 function updateStatus() {
     fetch('/proxy/status')
     .then(res => res.json())
@@ -230,7 +214,7 @@ function updateStatus() {
                 if (document.getElementById('fan')) document.getElementById('fan').innerText = status.fan;
                 if (document.getElementById('pump')) document.getElementById('pump').innerText = status.pump;
                 if (document.getElementById('stair')) document.getElementById('stair').innerText = status.stair;
-                if (document.getElementById('greenLed')) document.getElementById('greenLed').innerText = status.led_green;
+                                                                                                                                                                                     if (document.getElementById('greenLed')) document.getElementById('greenLed').innerText = status.led_green;
                 if (document.getElementById('redLed')) document.getElementById('redLed').innerText = status.led_red;
                 if (document.getElementById('buzzer')) document.getElementById('buzzer').innerText = status.buzzer;
                 if (document.getElementById('door')) document.getElementById('door').innerText = status.door;
